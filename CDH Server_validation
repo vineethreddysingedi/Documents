@@ -1,0 +1,295 @@
+
+
+
+Table of Contents
+	REVISION	4
+	Checklist :	5
+	Server Reboot:	5
+	Hadoop Servers Pre-Requisite Validation	6
+Master-1 : 10.100.74.41	6
+1.	OS Version :	6
+2.	Disk Formatting	6
+3.	OS Level checks:	7
+b.	Iptables	7
+c.	ntp services	8
+d.	SE-Linux :	8
+e.	Hostname :	9
+f.	DNS forward & reverse lookup :	9
+Master-2 : 10.100.74.42 :	10
+1.	OS Version :	10
+2.	Disk Formatting	10
+3.	OS Level checks:	11
+b.	Iptables	11
+c.	ntp services	12
+d.	SE-Linux :	12
+e.	Hostname :	13
+f.	DNS forward & reverse lookup :	13
+Datanode-1 : 10.100.74.36 :	14
+1.	OS Version :	14
+2.	Disk Formatting	14
+3.	OS Level checks:	15
+a.	Swappiness	15
+b.	Iptables	16
+c.	ntp service	16
+d.	Se-linux	17
+e.	Hostname :	17
+f.	DNS forward & reverse lookup	18
+Datanode-2 : 10.100.74.37 :	19
+1.	OS Version :	19
+2.	Disk Formatting :	19
+3.	OS Level checks:	20
+a.	Swappiness	20
+b.	Iptables	21
+c.	ntp service	21
+d.	Se-linux	21
+e.	Hostname :	22
+f.	DNS forward & reverse lookup	22
+Datanode-3 : 10.100.74.38 :	23
+4.	OS Version :	23
+5.	Disk Formatting :	23
+6.	OS Level checks:	24
+g.	Swappiness	24
+h.	Iptables	25
+i.	ntp service	25
+j.	Se-linux	25
+k.	Hostname :	25
+l.	DNS forward & reverse lookup	26
+Datanode-4 : 10.100.74.39 :	27
+1.	OS Version :	27
+2.	Disk Formatting :	27
+3.	OS Level checks:	28
+a.	Swappiness	28
+b.	Iptables :	29
+c.	ntp service	29
+d.	Se-linux	29
+e.	Hostname :	30
+f.	DNS forward & reverse lookup	30
+
+
+
+
+•	REVISION 
+
+
+Date
+Version
+Comment
+Aug-07-2017
+V1.0
+Initial Document
+Aug-08-2017
+V1.1
+OS support for Redhat/Cent-OS 6.9 included . 
+Aug-10-2017
+V1.2
+Removed “Hosts Unable to Connect” bullet point . 
+Able to login to 10.100.74.38 & 10.100.74.42 as “zaloni1” user.
+
+
+Data Disk mounted with “noatime” option . Removed the bullet point “Datanode Mount Option”
+
+
+FQDN not working
+
+
+
+
+o	
+
+•	Checklist : 
+
+Below was the checklist that was shared in the infrastructure document shared earlier . I have done a check on all the hosts ( few hosts are not accessible ) . 
+1.	CentOS 6.7 is installed ( Red-hat 6.9/Cent-OS 6.9 is a supported version per https://www.cloudera.com/documentation/enterprise/release-notes/topics/rn_consolidated_pcm.html#os58 
+2.	Disk formatted and partitioned per recommendations per Apendix (Section: FileSystem & Partition Recommendation in infra-document  )
+2.1.	For Slave/Data Nodes , /grid/* partitions are mounted using “noatime” mount 
+3.	After OS installation is complete :
+3.1.	Set Swappiness to 1 
+3.2.	Iptables turned off
+3.3.	SE-Linux turned off 
+3.4.	Hostnames & FQDN need to be setup , IP addresses, Routing tables setup 
+3.5.	Base and EPEL repos are available ( or proxy need to be setup to access the external repo’s )
+3.6.	DNS ( forward and reverse look up’s should be functional) and NTP setup
+3.7.	AD users added to Linux
+
+•	Server Reboot:
+
+Since SELINUX has been disabled and also to verify other configuration , it is advisable to reboot the servers . Please let us know once the reboot is complete .
+
+
+
+•	Hadoop Servers Pre-Requisite Validation 
+
+Master-1 : 10.100.74.41
+1.	OS Version : RedHat 6.9 
+
+2.	Disk Formatting 
+
+
+
+
+3.	OS Level checks: 
+a.	Swappiness : Recommended value has been set for the host.
+
+b.	Iptables :  iptables have been switched off as recommened 
+   
+
+c.	ntp services
+
+d.	SE-Linux : se-linux has been disabled as recommended . Reboot of the servers is needed . 
+
+
+e.	Hostname : FQDN missing . Integrating Linux server to AD/DNS will be a proper configuration . 
+
+f.	DNS forward & reverse lookup : DNS entry has not been made .
+
+
+
+Master-2 : 10.100.74.42 : 
+
+
+1.	OS Version : RedHat 6.9 
+
+2.	Disk Formatting 
+
+
+
+
+3.	OS Level checks: 
+a.	Swappiness : Recommended value has been set for the host.
+
+b.	Iptables :  iptables have been switched off as recommended 
+   
+
+c.	ntp services
+
+d.	SE-Linux : se-linux has been disabled as recommended . Reboot of the servers is needed . 
+
+
+e.	Hostname : FQDN missing . Integrating Linux server to AD/DNS will be a proper configuration . 
+
+f.	DNS forward & reverse lookup : DNS entry has not been made .
+
+
+
+Datanode-1 : 10.100.74.36 : 
+
+1.	OS Version : Red-Hat 6.9 
+
+2.	Disk Formatting 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.	OS Level checks: 
+a.	Swappiness :
+
+
+b.	Iptables :
+
+c.	ntp service 
+
+
+d.	Se-linux: se-linux has been disabled as recommended . Reboot of the servers is needed .
+
+
+e.	Hostname :
+
+
+
+f.	DNS forward & reverse lookup
+
+
+Datanode-2 : 10.100.74.37 : 
+
+1.	OS Version : Red-Hat 6.9 
+
+2.	Disk Formatting : noatime mount option is not in /etc/fstab for datanodes .
+
+
+3.	OS Level checks: 
+a.	Swappiness :
+
+
+b.	Iptables :
+
+c.	ntp service 
+
+d.	Se-linux
+
+
+e.	Hostname :
+
+
+f.	DNS forward & reverse lookup
+
+
+Datanode-3 : 10.100.74.38 : 
+
+4.	OS Version : Red-Hat 6.9 
+
+5.	Disk Formatting : noatime mount option is not in /etc/fstab for datanodes .
+
+
+6.	OS Level checks: 
+g.	Swappiness :
+
+
+h.	Iptables :
+
+i.	ntp service 
+
+j.	Se-linux
+
+
+k.	Hostname :
+
+
+l.	DNS forward & reverse lookup
+
+
+Datanode-4 : 10.100.74.39 : 
+
+
+1.	OS Version : Red-Hat 6.9 
+
+2.	Disk Formatting : noatime mount option is not in /etc/fstab for datanodes .
+
+
+
+3.	OS Level checks: 
+a.	Swappiness :
+
+
+b.	Iptables :
+
+c.	ntp service 
+
+d.	Se-linux
+
+
+e.	Hostname :
+
+
+f.	DNS forward & reverse lookup
+
+
+
+
+
+
+
+
+
+
+
+
