@@ -1,0 +1,67 @@
+Bigplay
+Adding a single user to multiple groups on ldap 
+
+1) Take the list of containers from the excecl sheet and run the below command
+
+for i in `cat cont.txt`; do  echo -e "$i --> "; ldapsearch -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -b ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa "(cn=$i)" | grep dn; done
+
+2) run the below script to create a ldif file
+
+#!/bin/bash
+
+while read cont;
+do
+echo DN: cn=$cont,ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>final.ldif
+echo 'changetype: modify' >>final.ldif
+echo 'add: member' >>final.ldif
+echo member: uid=vreddy,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>final.ldif
+echo -en "\n" >>final.ldif
+
+done </home/vreddy/cont.txt
+
+3) befroe running the script add group names to the cont.txt
+example: 
+axa_us_testing
+axa_us_testing_ro
+
+4)run the script and the output should be as follows
+
+DN: cn=axa_us_testing,ou=Containers,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
+changetype: modify
+add: member
+member: uid=vreddy,ou=Users,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
+
+DN: cn=axa_us_testing_ro,ou=Containers,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
+changetype: modify
+add: member
+member: uid=vreddy,ou=Users,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
+
+5) For Bigplay run the ldif command
+ ldapmodify -a -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -f cont_tent.ldif
+ 
+ ldapmodify -a -x -D "cn=Manager,dc=lab-na,dc=bigdata,dc=intraxa" -w WaV0rPv14REwgyko -H ldap://l51hdlab5 -f vreddy.ldif
+ ---------------------------------------------------------------------------------------------------------------------------
+ 
+ Deleting user from multiple groups
+ 
+ #!/bin/bash
+
+while read cont;
+do
+echo DN: cn=$cont,ou=Containers,dc=daas,dc=na,dc=bigdata,dc=intraxa >>cont_tent.ldif
+echo 'changetype: modify' >>cont_tent.ldif
+echo 'delete: member' >>cont_tent.ldif
+echo member: uid=arajagopalan,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>cont_tent.ldif
+echo -en "\n" >>cont_tent.ldif
+
+done <./container.txt
+
+while read tent;
+do
+echo DN: cn=$tent,ou=Tenants,dc=daas,dc=na,dc=bigdata,dc=intraxa>>cont_tent.ldif
+echo 'changetype: modify' >>cont_tent.ldif
+echo 'delete: member' >>cont_tent.ldif
+echo member: uid=arajagopalan,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>cont_tent.ldif
+echo -en "\n" >>cont_tent.ldif
+
+done <./tenant.txt
