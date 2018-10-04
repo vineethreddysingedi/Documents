@@ -1,0 +1,63 @@
+1) Fetch the uid for the emails listed on the excel sheet
+2) for loop command with matching mailid grep for the Uid
+
+for i in `cat email.txt` ; do ldapsearch -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -b "ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa" "(mail=$i)" | grep -w 'uid';  done | tee report.out
+
+output: 
+n: uid=asheikh,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+uid: asheikh
+dn: uid=adan,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+uid: adan
+---------------------------------------------------------------------
+3) Grep for uid and awk '{print $3}'get the list of users as below
+asheikh
+adan
+eradhakrishnan
+hpaul
+jpandya
+jsen
+mvajji
+-----------------------------------------------------------------------------
+4) ##!/bin/bash
+
+while read user;
+do
+echo DN: cn=axa_us_testing,ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>users.ldif
+echo 'changetype: modify' >>users.ldif
+echo 'add: member' >>users.ldif
+echo member: uid=$user,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>users.ldif
+echo -en "\n" >>users.ldif
+
+done <./uid.txt
+
+---------------------------------------------------------------------------------------------------------------
+
+output will be like below
+
+
+DN: cn=axa_us_testing,ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+changetype: modify
+add: member
+member: uid=pdebnath,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+
+DN: cn=axa_us_testing,ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+changetype: modify
+add: member
+member: uid=smanda,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa
+---------------------------------------------------------------------------------------------------------------
+Run the below command to update 
+ldapmodify -a -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -f cont_tent.ldif
+
+ldapmodify -a -x -D "cn=Manager,dc=lab-na,dc=bigdata,dc=intraxa" -w WaV0rPv14REwgyko -H ldap://l51hdlab5 -f users.ldif
+
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
