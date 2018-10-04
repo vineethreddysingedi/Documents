@@ -1,0 +1,73 @@
+
+
+
+
+
+Configuring OpenLDAP pass-through authentication to Active Directory
+
+
+Prerequisites – Active Directory Team
+
+1.	Check if the port is open on the Active directory
+2.	Export the Root Active Directory certificate to Open Ldap server
+3.	Need Domain Controller name and Bind DN username & Password to query Active Directory from LDAP
+
+Steps performed to integrate with AD
+1.	Building CA trust to Active Directory CA
+2.	Update the ldap.conf with the AD details as shown in the below along with pointing to the AD certificate
+•	URI ldap://W5CSDP01.axafinancialsvc.axa-financial.intraxa
+•	BASE DC=axafinancialsvc,DC=axa-financial,DC=INTRAXA
+•	TLS_CACERT /etc/openldap/cacerts/Axafinancialsvc01.cer
+•	TLS_CACERTDIR /etc/openldap/cacerts
+3.	Once the above steps are done you will now be able to query the AD using ldapsearch command
+Note: Although, you would require the Domain Controller name and Bind DN username & password to run the ldapsearch command		
+
+Configure SASLAUTHD
+
+1.	Edit   /etc/sysconfig/saslauthd set automatic start of SASLAUTHD as below
+•	start =’yes’
+•	Mechanisms =’ldap’
+2.	Create an openldap service user account if does not exists and it to the sasl group
+•	adduser ldap sasl
+3.	Edit /etc/saslauthd.conf and add the following information
+
+•	ldap_servers: ldap://W5CSDP01.axafinancialsvc.axa-financial.intraxa
+•	ldap_search_base: DC=axafinancialsvc,DC=axa-financial,DC=intraxa
+•	ldap_filter: sAMAccountName=%U
+•	ldap_timeout: 10
+•	ldap_deref: never
+•	ldap_restart: yes
+•	ldap_scope: sub
+•	ldap_use_sasl: no
+•	ldap_mech: DIGEST-MD5
+•	ldap_start_tls: no
+•	ldap_version: 3
+•	ldap_auth_method: bind
+•	ldap_bind_dn: CN=SVC_BigDataLDAPS,OU=Service Accounts,DC=axafinancialsvc,DC=axa-financial,DC=INTRAXA
+•	ldap_password: xxxxxxxxxxxxxxxxx
+•	log_level: 10
+Configure SLAPD to utilize SASLAUTHD
+
+1.	create a sub directory sasl2 if not exists and file called slapd.conf under /etc/  and add following lines
+•	mech_list: plain  
+•	 pwcheck_method: saslauthd
+•	saslauthd_path: /var/run/saslauthd/mux
+2.	On Apache directory make sure user object is authenticated via SASL   
+•	userpassword= {SASL}C116340                 
+                      
+References:
+
+https://ltb-project.org/documentation/general/sasl_delegation
+	
+https://www.openldap.org/doc/admin21/sasl.html
+
+
+
+
+
+
+
+
+
+
+
