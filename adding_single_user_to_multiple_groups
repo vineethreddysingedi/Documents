@@ -35,6 +35,10 @@ DN: cn=axa_us_testing_ro,ou=Containers,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
 changetype: modify
 add: member
 member: uid=vreddy,ou=Users,dc=lab,dc=lab-na,dc=bigdata,dc=intraxa
+-------------------------------------------------
+Real script
+
+
 
 5) For Bigplay run the ldif command
  ldapmodify -a -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -f cont_tent.ldif
@@ -65,3 +69,85 @@ echo member: uid=arajagopalan,ou=Users,dc=bigplay,dc=na,dc=bigdata,dc=intraxa >>
 echo -en "\n" >>cont_tent.ldif
 
 done <./tenant.txt
+-----------------------------------------------
+
+Real script
+
+###Generates ldif file for containers### 
+ 
+ 
+#!/bin/bash
+
+### Removes previous output file generated
+
+rm -r result_cont.ldif
+rm -r match_output.txt
+rm -r daas_report.out
+rm -r bigplay_report.out
+
+### passing parameters based on the username and the environment
+user=$1
+environment=$2
+add_delete=$3
+
+if [ $# -lt 3 ]
+then
+ echo " [ERROR] No arguments passed."
+ exit 1
+fi
+
+### Based on the environment given it will run one of the following Ldap search and generates a list of containers (bigplay/daas)
+
+if [ $2 == "daas" ]; then
+        ldapsearch -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -b ou=Containers,dc=daas,dc=na,dc=bigdata,dc=intraxa| grep cn= | tee ${2}_report.out
+         echo 'daas'
+		 
+elif [ $2 == "bigplay" ]; then
+        ldapsearch -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -b ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intraxa| grep cn= | tee ${2}_report.out
+        echo 'bigplay'
+fi
+
+
+# because File2.txt is bigger, it gets the main loop.
+# read each line of container.txt
+
+while read cont_name; do
+
+# read each line of ${2}_report.out
+	
+    while read user_cont; do
+	
+# It takes raw containers list as input eg:'dn: cn=axa_us_nba_audit_ro,ou=Containers,dc=bigplay,dc=na,dc=bigdata,dc=intrax' and performs awk to get the output similar as eg:'axa_us_aidb'
+		
+	OUTPUT=`echo $user_cont | awk -F ":" '{print $2}'| awk -F "=" '{print $2}' | awk -F "," '{print $1}'`
+	
+	
+# check match, and write if needed.
+
+	if [[ $cont_name == $OUTPUT ]] && [[ $cont_name != '' ]] && [[ $OUTPUT != '' ]]; then 
+	
+		
+		echo $cont_name
+		
+		echo DN: cn=$cont_name,ou=Containers,dc=$environment,dc=na,dc=bigdata,dc=intraxa >>result_cont.ldif
+		echo 'changetype: modify' >>result_cont.ldif
+		echo $add_delete: member >>result_cont.ldif
+		echo member: uid=$user,ou=Users,dc=$environment,dc=na,dc=bigdata,dc=intraxa >>result_cont.ldif
+		echo -en "\n" >>result_cont.ldif
+		
+		echo $cont_name >> match_output.txt
+	
+    fi
+    done < /home/vreddy/ldap_scripts/container/${2}_report.out
+done < /home/vreddy/ldap_scripts/container/container.txt
+		
+                                                                  
+ldapmodify -a -x -D "cn=Manager,dc=na,dc=bigdata,dc=intraxa" -w cloudera -H ldap://l51hdvmp-10 -f /home/vreddy/ldap_scripts/container/result_cont.ldif   
+ 
+                                      
+
+####Generates ldif file for Tenants##### 
+               
+
+
+
